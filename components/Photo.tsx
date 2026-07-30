@@ -5,22 +5,26 @@ import type { Photo as Fiche } from '@/lib/photos'
 // echouer tout bloc de texte dont la boite intersecte celle d'une photo. Une
 // photo n'a donc jamais de voile de protection ni de bande cuite — le
 // traitement de palette est deja dans le fichier.
+//
+// Le cadre prend le rapport du FICHIER : sans ca, `object-fit: cover` recadre
+// une seconde fois par-dessus le recadrage du build, et il en rogne jusqu'a la
+// moitie. Le sujet devient illisible sans que rien ne le signale.
 export default function Photo({
   fiche,
   sizes,
   priority = false,
-  hauteur,
   className = '',
 }: {
   fiche: Fiche
   sizes: string
   priority?: boolean
-  /** Hauteur de cadre en CSS ; l'image y est recadree par object-fit. */
-  hauteur: string
   className?: string
 }) {
   return (
-    <div className={`plaque-photo ${className}`} style={{ height: hauteur }}>
+    <div
+      className={`plaque-photo ${className}`}
+      style={{ aspectRatio: `${fiche.largeur} / ${fiche.hauteur}` }}
+    >
       <Image
         src={fiche.src}
         alt={fiche.alt}

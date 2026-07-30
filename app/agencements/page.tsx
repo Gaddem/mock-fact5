@@ -56,11 +56,10 @@ export default function Agencements() {
             <Panneau numero="PL-10b" titre="Finition posée">
               <Photo
                 fiche={PHOTOS.laSurface}
-                hauteur="clamp(200px, 32vw, 360px)"
                 sizes="(min-width: 1264px) 1198px, (min-width: 768px) calc(100vw - 66px), calc(100vw - 34px)"
               />
               <Calepinage>
-                <Piece x={0.4}>
+                <Piece x={0.4} className="md:flex md:flex-col md:justify-center">
                   <p className="lisible text-[15px] leading-relaxed text-muted">
                     Un plan de travail en chêne massif de 40 mm, deux ans après la pose. La
                     finition huile-cire se répare à l’endroit où elle est marquée ; un vernis, lui,

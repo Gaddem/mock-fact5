@@ -22,7 +22,7 @@ export default function Essences() {
         <Feuille>
           <Panneau numero="PL-20" titre="Feuille d’échantillons">
             <Calepinage className="lg:grid-cols-[1fr_1fr]">
-              <Piece className="!py-9 md:!py-14" x={0.25}>
+              <Piece className="!py-9 md:!py-14 md:flex md:flex-col md:justify-center" x={0.25}>
                 <p className="surtitre">Planche 20</p>
                 <h1 className="titre titre-plan mt-4">Essences</h1>
                 <p className="lisible mt-5 text-[16px] leading-relaxed text-muted md:text-[18px]">
@@ -34,7 +34,6 @@ export default function Essences() {
               <Piece x={0.75} fond className="!p-0">
                 <Photo
                   fiche={PHOTOS.avivesEmpiles}
-                  hauteur="clamp(220px, 34vw, 420px)"
                   className="border-0"
                   sizes="(min-width: 1264px) 599px, (min-width: 1024px) 50vw, (min-width: 768px) calc(100vw - 66px), calc(100vw - 34px)"
                 />
@@ -142,21 +141,24 @@ export default function Essences() {
         <Feuille>
           <EnScene>
             <Panneau numero="PL-23" titre="Stock">
-              <Calepinage className="md:grid-cols-[auto_1fr]">
-                <Piece x={0.15} fond className="md:min-w-[240px]">
+              <Calepinage className="md:grid-cols-2">
+                <Piece x={0.25} className="md:flex md:flex-col md:justify-center">
                   <Cote valeur="stock atelier" />
-                  <p className="mt-4 text-[14px] leading-relaxed text-muted">
+                  <p className="mt-5 text-[15px] leading-relaxed text-muted">
                     Tourillons, tasseaux et avivés sèchent à l’atelier avant d’être débités. Un
                     bois qui arrive le matin et passe à la machine l’après-midi travaille ensuite
-                    dans l’ouvrage.
+                    dans l’ouvrage : il faut qu’il ait fini de bouger avant, pas après.
+                  </p>
+                  <p className="mt-4 text-[15px] leading-relaxed text-muted">
+                    Le stock est rangé par essence et par épaisseur, sur chant, avec des baguettes
+                    entre les lits pour que l’air passe.
                   </p>
                 </Piece>
-                <Piece x={0.7} fond className="!p-0">
+                <Piece x={0.75} fond className="!p-0">
                   <Photo
                     fiche={PHOTOS.stockDebite}
-                    hauteur="clamp(220px, 36vw, 420px)"
                     className="border-0"
-                    sizes="(min-width: 1264px) 958px, (min-width: 768px) calc(100vw - 306px), calc(100vw - 34px)"
+                    sizes="(min-width: 1264px) 599px, (min-width: 768px) calc(50vw - 33px), calc(100vw - 34px)"
                   />
                 </Piece>
               </Calepinage>

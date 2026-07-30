@@ -12,7 +12,7 @@ Chacune est recadree et retraitee au build ; le binaire distant n est jamais ser
 
 - source : https://www.pexels.com/photo/10126390/
 - fichier d origine : https://images.pexels.com/photos/10126390/pexels-photo-10126390.jpeg
-- recadrage : 3648x2100 a partir de (0, 2200)
+- recadrage : 3648x3200 a partir de (0, 1500)
 - sujet : Gabarits traces au crayon sur des panneaux, pointes de reperage plantees le long du trace.
 - Ecriture manuscrite verifiee au zoom : hors focale, illisible, aucun nom d'entreprise ni de client.
 
@@ -20,7 +20,7 @@ Chacune est recadree et retraitee au build ; le binaire distant n est jamais ser
 
 - source : https://www.pexels.com/photo/10119308/
 - fichier d origine : https://images.pexels.com/photos/10119308/pexels-photo-10119308.jpeg
-- recadrage : 3648x2050 a partir de (0, 3050)
+- recadrage : 3648x3000 a partir de (0, 2450)
 - sujet : Des pieces sortent du panneau, sciure de coupe autour des traits.
 - Recadree sous la broche : sa plaque signaletique porte une marque et un marquage CE lisibles. Le point sombre sur la piece est une vis de bridage, pas un marquage.
 
@@ -36,7 +36,7 @@ Chacune est recadree et retraitee au build ; le binaire distant n est jamais ser
 
 - source : https://www.pexels.com/photo/8817831/
 - fichier d origine : https://images.pexels.com/photos/8817831/pexels-photo-8817831.jpeg
-- recadrage : 3648x2432 a partir de (0, 1400)
+- recadrage : 3648x3000 a partir de (0, 1100)
 - sujet : Avives empiles sur chant, noeuds et fil visibles sur les tranches rabotees.
 - Aucun recadrage necessaire hors mise au format paysage.
 
@@ -44,7 +44,7 @@ Chacune est recadree et retraitee au build ; le binaire distant n est jamais ser
 
 - source : https://www.pexels.com/photo/18420594/
 - fichier d origine : https://images.pexels.com/photos/18420594/pexels-photo-18420594.jpeg
-- recadrage : 3040x2027 a partir de (0, 1900)
+- recadrage : 3040x2530 a partir de (0, 1500)
 - sujet : Stock debite : tourillons et tasseaux ranges sur rack, bois de bout en masse.
 - Recadree pour ecarter la charpente metallique du plafond et les luminaires.
 

@@ -15,6 +15,10 @@ const X_FAMILLES = [0.33, 0.83, 0.17, 0.5, 0.83]
 const X_ETAPES = [0.17, 0.5, 0.83, 0.17, 0.5]
 const X_FOURNITURES = [0.17, 0.5, 0.83, 0.17, 0.5, 0.83]
 
+const PLEINE_LARGEUR =
+  '(min-width: 1264px) 1198px, (min-width: 768px) calc(100vw - 66px), calc(100vw - 34px)'
+const DEMI = '(min-width: 1264px) 599px, (min-width: 768px) calc(50vw - 33px), calc(100vw - 34px)'
+
 export const metadata: Metadata = {
   title: 'Bois de Bout — menuiserie et agencement sur mesure',
   description:
@@ -139,21 +143,21 @@ export default function Accueil() {
         <Feuille>
           <EnScene>
             <Panneau numero="PL-03" titre="Report du tracé">
-              <Photo
-                fiche={PHOTOS.leTrace}
-                hauteur="clamp(220px, 40vw, 440px)"
-                sizes="(min-width: 1264px) 1198px, (min-width: 768px) calc(100vw - 66px), calc(100vw - 34px)"
-              />
-              <Calepinage className="md:grid-cols-[1fr_auto]">
-                <Piece x={0.3}>
+              <Calepinage className="md:grid-cols-2">
+                <Piece x={0.25} className="md:flex md:flex-col md:justify-center">
                   <p className="lisible text-[15px] leading-relaxed text-muted">
                     Le tracé grandeur nature reporté sur le panneau. Ce que le plan a fixé en
                     millimètres, le gabarit le rend palpable — et c’est là, pas plus tard, qu’on
                     voit qu’une courbe passe mal ou qu’un jeu manque.
                   </p>
+                  <p className="mt-4 text-[15px] leading-relaxed text-muted">
+                    Les pointes plantées le long du trait tiennent le gabarit pendant qu’on le
+                    suit à la défonceuse. Elles se retirent, le trait reste.
+                  </p>
+                  <Cote className="mt-6" valeur="échelle 1:1" />
                 </Piece>
-                <Piece x={0.85} fond className="md:min-w-[220px]">
-                  <Cote valeur="échelle 1:1" />
+                <Piece x={0.75} fond className="!p-0">
+                  <Photo fiche={PHOTOS.leTrace} className="border-0" sizes={DEMI} />
                 </Piece>
               </Calepinage>
             </Panneau>
@@ -182,7 +186,7 @@ export default function Accueil() {
                     key={etape.numero}
                     x={X_ETAPES[index]}
                     travaillee
-                    className={index === 4 ? 'xl:col-span-2' : ''}
+                    className={index === 4 ? 'xl:col-span-3' : ''}
                   >
                     <div className="flex items-baseline gap-3">
                       <span className="font-titre text-[26px] leading-none text-chene">
@@ -196,58 +200,30 @@ export default function Accueil() {
                     </p>
                   </Piece>
                 ))}
-                {/* Place explicitement en troisieme colonne pour que l'ordre de
-                    lecture reste 01 a 05, la photo apres. */}
-                <Piece
-                  x={0.85}
-                  fond
-                  className="!p-0 xl:col-start-3 xl:row-start-1 xl:row-span-2"
-                >
-                  <Photo
-                    fiche={PHOTOS.laSurface}
-                    hauteur="100%"
-                    className="h-full min-h-[220px] border-0"
-                    sizes="(min-width: 1264px) 399px, (min-width: 768px) calc(50vw - 33px), calc(100vw - 34px)"
-                  />
-                </Piece>
               </Calepinage>
-            </Panneau>
-          </EnScene>
-        </Feuille>
-      </section>
-
-      {/* ------------------------------------------------- PL-05 le débit */}
-      <section className="mt-[var(--section-y)]">
-        <Feuille>
-          <EnScene>
-            <Panneau numero="PL-05" titre="Débit dans le panneau">
+              <Photo fiche={PHOTOS.laSurface} sizes={PLEINE_LARGEUR} />
               <Calepinage className="md:grid-cols-[auto_1fr]">
                 <Piece x={0.15} fond className="md:min-w-[240px]">
-                  <Cote valeur="perte 6,4 %" />
+                  <Cote valeur="temps 04" />
                 </Piece>
                 <Piece x={0.7}>
                   <p className="lisible text-[15px] leading-relaxed text-muted">
-                    Le calepinage décide de ce que coûte un panneau. Les pièces y sont rangées
-                    comme les blocs de cette page : jointives, de tailles inégales, orientées dans
-                    le sens du fil quand le fil compte.
+                    La finition, deux ans après. L’huile-cire se répare à l’endroit où elle est
+                    marquée ; un vernis, lui, se refait en entier. C’est ce qui décide de la
+                    finition d’un plan de travail, pas son aspect le jour de la pose.
                   </p>
                 </Piece>
               </Calepinage>
-              <Photo
-                fiche={PHOTOS.leDebit}
-                hauteur="clamp(220px, 40vw, 440px)"
-                sizes="(min-width: 1264px) 1198px, (min-width: 768px) calc(100vw - 66px), calc(100vw - 34px)"
-              />
             </Panneau>
           </EnScene>
         </Feuille>
       </section>
 
-      {/* ----------------------------------------------- PL-06 fournitures */}
+      {/* ----------------------------------------------- PL-05 fournitures */}
       <section className="mt-[var(--section-y)]">
         <Feuille>
           <EnScene>
-            <Coupe numero="PL-06" titre="Nomenclature de fournitures">
+            <Coupe numero="PL-05" titre="Nomenclature de fournitures">
               <Calepinage cote={1}>
                 <Piece x={0.25}>
                   <h2 className="titre titre-section">Ce qu’il y a dedans</h2>
@@ -275,6 +251,33 @@ export default function Accueil() {
                 ))}
               </Calepinage>
             </Coupe>
+          </EnScene>
+        </Feuille>
+      </section>
+
+      {/* ------------------------------------------------- PL-06 le débit */}
+      <section className="mt-[var(--section-y)]">
+        <Feuille>
+          <EnScene>
+            <Panneau numero="PL-06" titre="Débit dans le panneau">
+              <Calepinage className="md:grid-cols-2">
+                <Piece x={0.25} fond className="!p-0 md:order-2">
+                  <Photo fiche={PHOTOS.leDebit} className="border-0" sizes={DEMI} />
+                </Piece>
+                <Piece x={0.75} className="md:flex md:flex-col md:justify-center">
+                  <p className="lisible text-[15px] leading-relaxed text-muted">
+                    Le calepinage décide de ce que coûte un panneau. Les pièces y sont rangées
+                    comme les blocs de cette page : jointives, de tailles inégales, orientées dans
+                    le sens du fil quand le fil compte.
+                  </p>
+                  <p className="mt-4 text-[15px] leading-relaxed text-muted">
+                    Ce qui sort du panneau ne revient pas dedans : une chute de 40 mm ne fait ni
+                    une tablette ni un chant. La perte se décide au plan, pas à la machine.
+                  </p>
+                  <Cote className="mt-6" valeur="perte 6,4 %" />
+                </Piece>
+              </Calepinage>
+            </Panneau>
           </EnScene>
         </Feuille>
       </section>
