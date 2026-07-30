@@ -1,0 +1,584 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-fond: #1c1714;
+  --color-surface: #262019;
+  --color-texte: #f0e8da;
+  --color-muted: #a79684;
+  --color-accent: #5b8ad6;
+  --color-chene: #c9a876;
+  --color-bordure: #382f27;
+
+  --font-titre: var(--police-titre), ui-sans-serif, system-ui, sans-serif;
+  --font-texte: var(--police-texte), Georgia, serif;
+
+  /* Un plan d'atelier n'a ni coin arrondi ni ombre portee : les utilitaires
+     correspondants sont retires du theme plutot que seulement evites. */
+  --radius-*: initial;
+  --shadow-*: initial;
+  --drop-shadow-*: initial;
+}
+
+@layer base {
+  :root {
+    --section-y: 96px;
+    --contenu-max: 1200px;
+    --chanfrein: 10px;
+
+    /* Signature : position de la scie le long du panneau. 1 = coupe faite,
+       panneau ouvert. C'est la valeur par defaut, donc sans JS, en mouvement
+       reduit ou dans un document que le navigateur ne compose pas, tout est
+       deja ouvert et lisible. */
+    --coupe: 1;
+    /* Demi-saignee : de combien chaque moitie s'ecarte du trait. */
+    --saignee: 9px;
+  }
+
+  html {
+    background: var(--color-fond);
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--color-fond);
+    color: var(--color-texte);
+    font-family: var(--font-texte);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-fond);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-chene);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* ---------------------------------------------------------------- formes */
+
+  /* Arete chanfreinee : deux coins casses a 45 degres, jamais un radius. */
+  .chanfrein {
+    clip-path: polygon(
+      var(--chanfrein) 0,
+      100% 0,
+      100% calc(100% - var(--chanfrein)),
+      calc(100% - var(--chanfrein)) 100%,
+      0 100%,
+      0 var(--chanfrein)
+    );
+  }
+
+  /* Sur un element focalisable, le clip-path rognerait l'anneau de focus :
+     on le rentre a l'interieur. */
+  .chanfrein:focus-visible {
+    outline-offset: -4px;
+  }
+
+  /* --------------------------------------------------------------- texture */
+
+  /* Fil du bois : fibres verticales tres faibles, sur les SURFACES seulement.
+     Deux trames de pas premiers entre eux, sinon le motif se lit comme du
+     velours cotele regulier. */
+  .fil-du-bois {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .fil-du-bois::after,
+  .piece::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(90deg, rgb(240 232 218 / 0.014) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgb(0 0 0 / 0.022) 0 1px, transparent 1px 7px);
+  }
+
+  /* ------------------------------------------------ layout feuille de debit */
+
+  .feuille {
+    width: 100%;
+    max-width: var(--contenu-max);
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+
+  @media (min-width: 768px) {
+    .feuille {
+      padding-inline: 32px;
+    }
+  }
+
+  /* Le panneau : bord de feuille, contexte de conteneur pour les titres,
+     et bloc de reference pour le trait de scie. */
+  .panneau {
+    container-type: inline-size;
+    position: relative;
+    border: 1px solid var(--color-bordure);
+    background: var(--color-fond);
+  }
+
+  /* Calepinage : rectangles jointifs, aucune gouttiere. Le seul separateur
+     est le trait de 1 px que laisse le fond entre les cellules. */
+  .calepinage {
+    display: grid;
+    gap: 1px;
+    background: var(--color-bordure);
+    grid-template-columns: 1fr;
+  }
+
+  .piece {
+    container-type: inline-size;
+    min-width: 0;
+    position: relative;
+    isolation: isolate;
+    background: var(--color-surface);
+    padding: 20px 18px;
+  }
+
+  @media (min-width: 768px) {
+    .piece {
+      padding: 28px 26px;
+    }
+  }
+
+  .piece-fond {
+    background: var(--color-fond);
+  }
+
+  /* --------------------------------------------------- lignes de cote */
+
+  .cote {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-titre);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+    text-transform: uppercase;
+  }
+
+  .cote-trait {
+    flex: 1 1 auto;
+    min-width: 12px;
+    height: 1px;
+    background: var(--color-bordure);
+    transform-origin: left center;
+    transition: scale 0.55s cubic-bezier(0.22, 0.8, 0.3, 1);
+  }
+
+  .cote-trait + .cote-valeur + .cote-trait {
+    transform-origin: right center;
+  }
+
+  .cote-fleche {
+    width: 0;
+    height: 0;
+    flex: none;
+    border-block: 3px solid transparent;
+    border-right: 6px solid var(--color-bordure);
+    transition: opacity 0.3s linear 0.35s;
+  }
+
+  .cote-fleche-fin {
+    border-right: 0;
+    border-left: 6px solid var(--color-bordure);
+  }
+
+  .cote-valeur {
+    flex: none;
+    white-space: nowrap;
+  }
+
+  /* Etat de depart, pose PAR LE SCRIPT et seulement sur ce qui est encore
+     sous la ligne de flottaison. L'etat d'arrivee est l'ABSENCE de cette
+     regle : rien n'a besoin de gagner une transition pour etre lisible. */
+  [data-attente] .cote-trait {
+    scale: 0 1;
+  }
+
+  [data-attente] .cote-fleche {
+    opacity: 0;
+  }
+
+  /* ------------------------------------------------- reperes de percage */
+
+  .repere {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    color: var(--color-bordure);
+    pointer-events: none;
+    transition: opacity 0.4s linear 0.2s;
+  }
+
+  .repere::before,
+  .repere::after {
+    content: '';
+    position: absolute;
+    background: currentColor;
+  }
+
+  .repere::before {
+    inset-inline: 0;
+    top: 4px;
+    height: 1px;
+  }
+
+  .repere::after {
+    inset-block: 0;
+    left: 4px;
+    width: 1px;
+  }
+
+  [data-attente] .repere {
+    opacity: 0;
+  }
+
+  /* --------------------------------------------- ligne de rappel */
+
+  /* Sur un plan, la ligne de rappel est ce qui relie la piece a sa cote. Elle
+     se tire du haut vers le bas quand le bloc entre en scene. Decorative : au
+     pire elle est deja tiree. */
+  .piece-cotee::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-chene);
+    opacity: 0.4;
+    transform-origin: top center;
+    transition: scale 0.6s cubic-bezier(0.22, 0.8, 0.3, 1);
+    pointer-events: none;
+  }
+
+  [data-attente] .piece-cotee::before {
+    scale: 1 0;
+  }
+
+  /* ------------------------------------- l'elevation se monte */
+
+  /* L'ouvrage se monte dans l'ordre de fabrication : le bati, puis ce qui s'y
+     pose, puis le sol, puis les cotes. Deplacement de POSITION uniquement — un
+     plan fige a mi-course reste entierement lisible, seulement un peu decale. */
+  [data-phase] {
+    transition: translate 0.6s cubic-bezier(0.22, 0.8, 0.3, 1);
+  }
+
+  [data-attente] [data-phase] {
+    translate: 0 14px;
+  }
+
+  [data-phase='2'] {
+    transition-delay: 0.1s;
+  }
+
+  [data-phase='3'] {
+    transition-delay: 0.2s;
+  }
+
+  [data-phase='4'] {
+    transition-delay: 0.3s;
+  }
+
+  /* ------------------------------------------------------ entree en scene */
+
+  /* Deplacement de POSITION uniquement. Une entree qui partirait de
+     l'invisible resterait invisible dans un document non composite, ou la
+     timeline reste a currentTime 0. Au pire ici, le bloc est pose 14 px trop
+     bas et se lit quand meme. */
+  .en-scene {
+    transition: translate 0.6s cubic-bezier(0.22, 0.8, 0.3, 1);
+  }
+
+  [data-attente].en-scene,
+  [data-attente] .en-scene {
+    translate: 0 14px;
+  }
+
+  /* --------------------------------------------- signature : coupe au trait */
+
+  .coupe {
+    overflow: hidden;
+  }
+
+  /* La saignee est un VRAI vide dans la mise en page : au repos (--coupe: 1)
+     aucune transformation n'est posee et la composition est celle qui est
+     ecrite. Tout ce qui peut echouer laisse donc le panneau ouvert et lisible. */
+  /* La saignee decouvre la face sciee : des hachures, comme la section coupee
+     d'un plan. Elles n'apparaissent que dans l'ouverture. */
+  .ligne-de-coupe {
+    position: relative;
+    height: calc(2 * var(--saignee) + 1px);
+    background-color: var(--color-fond);
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--color-bordure) 0 1px,
+      transparent 1px 6px
+    );
+  }
+
+  /* La pointe SORT du panneau en fin de course : sans ce depassement, les
+     pieces de la derniere colonne n'atteindraient jamais leur ouverture
+     complete et resteraient decalees en permanence. */
+  .coupe {
+    --tete: calc(var(--coupe) * 1.24);
+  }
+
+  /* Une piece ne se referme que devant la scie : elle rejoint sa place des
+     que la pointe a depasse son abscisse. Le trait mene, le panneau suit. */
+  .coupe .piece {
+    --ouverture: clamp(0, calc((var(--tete) - var(--x, 0)) / 0.22), 1);
+    translate: 0 calc(var(--cote-coupe, 0) * (1 - var(--ouverture)) * var(--saignee));
+  }
+
+  /* La scie : un segment court qui traine derriere la pointe, invisible aux
+     deux extremites de la course. Panneau entier ou panneau ouvert, aucun
+     trait n'est visible. */
+  .trait-de-scie {
+    position: absolute;
+    left: -240px;
+    top: calc(50% - 1px);
+    width: 240px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--color-accent));
+    translate: calc(min(1, var(--tete)) * 100cqw) 0;
+    opacity: min(1, calc(min(var(--tete), calc(1 - var(--tete))) * 7));
+    pointer-events: none;
+  }
+
+  .trait-de-scie::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -6px;
+    width: 1px;
+    height: 13px;
+    background: var(--color-accent);
+  }
+
+  /* ------------------------------------------------------------- hachures */
+
+  .hachure {
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--color-bordure) 0 1px,
+      transparent 1px 7px
+    );
+  }
+
+  /* Face de coupe : elle se remplit de hachures au survol de la piece. */
+  .face-de-coupe {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s linear;
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--color-chene) 0 1px,
+      transparent 1px 5px
+    );
+  }
+
+  /* --------------------------------------------------- copeau qui se detache */
+
+  .copeau {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--chanfrein);
+    height: var(--chanfrein);
+    background: var(--color-chene);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    opacity: 0;
+    transform-origin: 0 0;
+    transition:
+      opacity 0.25s linear,
+      rotate 0.35s cubic-bezier(0.3, 0.9, 0.4, 1),
+      translate 0.35s cubic-bezier(0.3, 0.9, 0.4, 1);
+    pointer-events: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .piece:hover .face-de-coupe {
+      opacity: 0.85;
+    }
+
+    .piece:hover .copeau {
+      opacity: 1;
+      rotate: -14deg;
+      translate: -3px -3px;
+    }
+  }
+
+  /* -------------------------------------------------------------- typographie */
+
+  .titre {
+    font-family: var(--font-titre);
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  /* Un titre se dimensionne sur SA COLONNE : un mot seul ne peut pas se
+     replier, et il deborderait sa cellule sans que la page deborde. */
+  .titre-plan {
+    font-size: clamp(1.9rem, 9.5cqi, 4.4rem);
+  }
+
+  .titre-piece {
+    font-size: clamp(1.15rem, 7.5cqi, 1.9rem);
+  }
+
+  .titre-section {
+    font-size: clamp(1.4rem, 8cqi, 2.6rem);
+  }
+
+  .surtitre {
+    font-family: var(--font-titre);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .repere-marge {
+    font-family: var(--font-titre);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-chene);
+  }
+
+  .lisible {
+    max-width: 62ch;
+  }
+
+  /* ------------------------------------------------------------- la plaque */
+
+  /* Sur une plaque outremer pleine, l'encre est le FOND (5,12:1). Le texte
+     clair y serait a 2,85:1 — interdit, etats permanents compris. */
+  .plaque {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 22px;
+    background: var(--color-accent);
+    color: var(--color-fond);
+    font-family: var(--font-titre);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition:
+      background-color 0.2s linear,
+      clip-path 0.25s cubic-bezier(0.3, 0.9, 0.4, 1);
+  }
+
+  /* Le chanfrein mord : au survol, l'arete est cassee plus profondement, comme
+     un deuxieme passage a la defonceuse. */
+  @media (hover: hover) and (pointer: fine) {
+    .plaque:hover {
+      --chanfrein: 18px;
+    }
+  }
+
+  .plaque:hover {
+    background: #7ba2e0;
+  }
+
+  .lien-plan {
+    color: var(--color-texte);
+    text-decoration: underline;
+    text-decoration-color: var(--color-bordure);
+    text-underline-offset: 5px;
+    text-decoration-thickness: 1px;
+    transition: text-decoration-color 0.2s linear;
+  }
+
+  .lien-plan:hover {
+    text-decoration-color: var(--color-chene);
+  }
+
+  /* ------------------------------------------------------------- curseur */
+
+  /* La classe est posee PAR LE SCRIPT : dans la feuille, un echec de JS
+     laisserait la page sans aucun pointeur. */
+  .sans-curseur,
+  .sans-curseur * {
+    cursor: none;
+  }
+
+  .trusquin {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 90;
+    width: 1px;
+    height: 26px;
+    background: var(--color-chene);
+    pointer-events: none;
+    will-change: translate;
+  }
+
+  .trusquin::after {
+    content: '';
+    position: absolute;
+    left: -3px;
+    bottom: -1px;
+    width: 7px;
+    height: 7px;
+    background: var(--color-chene);
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+  }
+
+  /* ---------------------------------------------------------------- photo */
+
+  .plaque-photo {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-fond);
+    border: 1px solid var(--color-bordure);
+  }
+
+  .plaque-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* Hors couche : ce bloc doit tout ecraser. `reduce` coupe, il n'attenue pas. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  :root {
+    --coupe: 1 !important;
+  }
+
+  .trusquin {
+    display: none !important;
+  }
+}
