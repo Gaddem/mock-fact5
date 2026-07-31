@@ -1,0 +1,14 @@
+{
+  "slug": "mock-fact5",
+  "marque": "Bois de Bout",
+  "port": 4173,
+  "pages": [
+    "/",
+    "/agencements/",
+    "/essences/",
+    "/devis/"
+  ],
+  "introuvable": "/inconnue/",
+  "colonneCollante": null,
+  "interditsSiMasque": []
+}
