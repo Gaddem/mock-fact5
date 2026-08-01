@@ -109,8 +109,12 @@ export function suivreCoupe(element: HTMLElement) {
 
 /* ---------------------------------------------------- entrees en scene */
 
-const SEUIL_ENTREE = 0.15
-const SEUIL_CHIEN = 0.01
+// La revelation se declenche sur une LIGNE d'ecran, pas sur une fraction de
+// l'element : un seuil de 15 % revelait un bloc de 200 px des que 30 px
+// depassaient du bord bas, et le point de declenchement dependait de la
+// hauteur du bloc. Une marge basse NEGATIVE retrecit la racine : avec un
+// seuil de 0, tout se declenche quand le haut passe 82 % de l'ecran.
+const BANDE_BASSE = '-18%'
 const DELAI_CHIEN = 1200
 
 const minuteries = new WeakMap<HTMLElement, number>()
@@ -136,7 +140,7 @@ function scene() {
     (entrees) => {
       for (const entree of entrees) {
         const element = entree.target as HTMLElement
-        if (entree.intersectionRatio >= SEUIL_ENTREE) {
+        if (entree.isIntersecting) {
           reveler(element)
           continue
         }
@@ -145,12 +149,14 @@ function scene() {
         // l'observateur quand il fonctionne. Les minuteries vont dans une
         // WeakMap : un observateur partage cree au premier appel ne connait
         // sinon que la minuterie du premier element observe.
-        if (entree.isIntersecting && !minuteries.has(element)) {
+        const boite = entree.boundingClientRect
+        const visible = boite.top < window.innerHeight && boite.bottom > 0
+        if (visible && !minuteries.has(element)) {
           minuteries.set(element, window.setTimeout(() => reveler(element), DELAI_CHIEN))
         }
       }
     },
-    { threshold: [SEUIL_CHIEN, SEUIL_ENTREE] },
+    { rootMargin: `0px 0px ${BANDE_BASSE} 0px`, threshold: 0 },
   )
   return observateurScene
 }
